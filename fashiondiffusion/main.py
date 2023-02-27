@@ -1,4 +1,4 @@
-import torch
+# import torch
 import firebase_admin
 from firebase_admin import credentials, storage
 from diffusers import DiffusionPipeline
@@ -9,7 +9,7 @@ from uuid import uuid4
 import time
 
 # set up firebase credentials, put the firebase admin sdk in the same directory as this python file
-cred = credentials.Certificate("/greenieverse-firebase-adminsdk-e3b5a-f38879b828.json")
+cred = credentials.Certificate("firebase-admin.json")
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'greenieverse.appspot.com'
 })
@@ -48,9 +48,9 @@ print("Generating time: ", end-start)
 bucket = storage.bucket()
 token = uuid4()
 metadata = {"firebaseStorageDownloadTokens": token}
-blob = bucket.blob("/test.png")
+blob = bucket.blob("test.png")
 blob.metadata = metadata
-with open("/test.png", "rb") as image_file:
+with open("test.png", "rb") as image_file:
     blob.upload_from_file(image_file, content_type="image/png")
 api = blob.generate_signed_url(expiration=datetime.datetime(2024, 1, 20), method='GET', access_token=token)
 
