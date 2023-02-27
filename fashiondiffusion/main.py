@@ -28,7 +28,7 @@ print("Time loading: ", end - start)
 height = 512
 width = 512
 cfg_scale = 10 # guidance_scale
-seed = torch.Generator("cuda").manual_seed(44) # generator
+# seed = torch.Generator("cuda").manual_seed(44) # generator
 step = 25 # num_inference_steps
 negative = "out of frame, duplicate, watermark, signature, text, ugly, morbid, mutated, deformed, blurry, bad anatomy, bad proportions, cloned face, disfigured, fused fingers, fused limbs, too many fingers, long neck, twisted face, three legs"
 # prompt = sys.argv[1]
@@ -36,7 +36,7 @@ prompt = "the storm buried in the light"
 
 # image generation
 start = time.time()
-image = pipe(prompt, num_inference_steps=step, guidance_scale=cfg_scale, generator=seed, negative_prompt=negative).images[0]
+image = pipe(prompt, num_inference_steps=step, guidance_scale=cfg_scale, negative_prompt=negative).images[0]
 image.save(f"test.png")
  
 end = time.time()
