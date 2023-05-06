@@ -16,7 +16,7 @@ firebase_admin.initialize_app(cred, {
 
 start = time.time()
 # Install pre-trained pipeline from hugging face
-pipe = DiffusionPipeline.from_pretrained("22h/vintedois-diffusion-v0-1")
+pipe = DiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float16)
 # pipe = pipeline.to("cuda") # Use cuda only if the GPU is nvidia
 end = time.time()
 print("Time loading: ", end - start)
