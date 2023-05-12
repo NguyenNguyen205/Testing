@@ -18,7 +18,7 @@ import torch
 # set up firebase
 import firebase_admin
 from firebase_admin import credentials
-cred = credentials.Certificate("/firebase-admin2.json")
+cred = credentials.Certificate("./firebase-admin2.json")
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'fashion-diffusion.appspot.com'
 })
@@ -83,10 +83,10 @@ def getImage():
   token = uuid4()
   strToken = str(token)
   metadata = {"firebaseStorageDownloadTokens": token}
-  image.save(f"/" + strToken + ".png")
+  image.save(f"./" + strToken + ".png")
   blob = bucket.blob("/" + strToken +".png")
   blob.metadata = metadata
-  with open("/" + strToken + ".png", "rb") as image_file:
+  with open("./" + strToken + ".png", "rb") as image_file:
     blob.upload_from_file(image_file, content_type="image/png")
   api = blob.generate_signed_url(expiration=datetime.datetime(2024, 1, 20), method='GET', access_token=token)
   print(api)
