@@ -11,10 +11,14 @@ firebase_admin.initialize_app(cred, {
 from diffusers import DiffusionPipeline
 from diffusers import StableDiffusionPipeline, EulerDiscreteScheduler
 # pipeline = DiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float16)
-model_id = "dreamlike-art/dreamlike-photoreal-2.0"
+model_id = "stabilityai/stable-diffusion-2-1-base"
 scheduler = EulerDiscreteScheduler.from_pretrained(model_id, subfolder="scheduler")
-pipeline = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
+## Testing generating speed
+from diffusers import DPMSolverMultistepScheduler
+pipeline = StableDiffusionPipeline.from_pretrained(model_id, scheduler=scheduler, torch_dtype=torch.float16)
 pipe = pipeline.to("cuda")
+pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
+
 ## Setting up web server
 from flask_cors import CORS
 from flask import request, Response
@@ -52,7 +56,7 @@ def getImage():
   data["createdDate"] = datetime.datetime.now(pytz.timezone("Asia/Ho_Chi_Minh"))
   data["userID"] = request.json["userID"]
   ## create image
-  step = 50
+  step = 30
   image = pipe(data["prompt"], negative_prompt=negative, num_inference_steps=step).images[0] 
   token = uuid4()
   strToken = str(token)
