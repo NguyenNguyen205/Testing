@@ -1,18 +1,3 @@
-# from flask import Flask, Response
-# # from flask_ngrok import run_with_ngrok
-# from flask_cors import CORS
-# # from flask_lt import run_with_lt
-# app = Flask('Testing')
-# CORS(app)
-# # run_with_ngrok(app)
-# # run_with_lt(app)
-# @app.route('/')
-# def home():
-#   res = Response("Hello world again")
-#   return res;
-
-# app.run()
-# Remember to update requirements.txt
 ## Config
 import torch
 # set up firebase
@@ -24,7 +9,11 @@ firebase_admin.initialize_app(cred, {
 })
 
 from diffusers import DiffusionPipeline
-pipeline = DiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float16)
+from diffusers import StableDiffusionPipeline, EulerDiscreteScheduler
+# pipeline = DiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float16)
+model_id = "stabilityai/stable-diffusion-2-1-base"
+scheduler = EulerDiscreteScheduler.from_pretrained(model_id, subfolder="scheduler")
+pipeline = StableDiffusionPipeline.from_pretrained(model_id, scheduler=scheduler, torch_dtype=torch.float16)
 pipe = pipeline.to("cuda")
 ## Setting up web server
 from flask_cors import CORS
@@ -50,13 +39,6 @@ def home():
 def getImage():
 
   negative = "out of frame, duplicate, watermark, signature, text, ugly, morbid, mutated, deformed, blurry, bad anatomy, bad proportions, cloned face, disfigured, fused fingers, fused limbs, too many fingers, long neck, twisted face, three legs"
-
-#   prompt = request.args.get('prompt', default="*", type= str)
-  # print(request.json["style"]);
-  res = Response("Here")
-  res.headers.add("Access-Control-Allow-Origin", "*")
-  res.headers.add("Access-Control-Allow-Headers", "*")
-  res.headers.add("Access-Control-Allow-Methods", "*")
   # return res
   ## get data 
   data = {}
@@ -70,14 +52,6 @@ def getImage():
   data["createdDate"] = datetime.datetime.now(pytz.timezone("Asia/Ho_Chi_Minh"))
   data["userID"] = request.json["userID"]
   ## create image
-
-  # default = "https://firebasestorage.googleapis.com/v0/b/greenieverse.appspot.com/o/%2F%2F_test.png?alt=media&token=e7c691e6-f1be-4a95-bc97-3bae7195ef57"
-  # if (prompt == "*"):
-  #   # default image
-  #   rep = Response(default);
-  #   rep.headers['ngrok-skip-browser-warning'] = '*'
-  #   rep.headers['Access-Control-Allow-Origin'] = '*'
-  #   return rep
   step = 50
   image = pipe(data["prompt"], negative_prompt=negative, num_inference_steps=step).images[0] 
   token = uuid4()
@@ -91,7 +65,6 @@ def getImage():
   api = blob.generate_signed_url(expiration=datetime.datetime(2024, 1, 20), method='GET', access_token=token)
   print(api)
   data["imageUrl"] = api
-  # res = Response(api);
   ## Save data to firebase
   db.collection("cloth").add(data)
   res = Response(api)
